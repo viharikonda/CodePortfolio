@@ -1,0 +1,166 @@
+---
+title: "vkonda_week10"
+author: "Vihari Konda"
+date: "7/28/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Week 9
+```{r}
+library(tidyverse) 
+library(cluster) 
+library(factoextra)
+library(dendextend)
+```
+
+```{r}
+df <- USArrests # Loading out of the box dataset
+df <- na.omit(df) # Removing NA values
+df <- scale(df) # Standardising the data 
+head(df)
+```
+
+```{r}
+# Dissimilarity matrix
+d <- dist(df, method = "euclidean")
+```
+
+```{r}
+# Hierarchical clustering using Complete Linkage
+hc1 <- hclust(d, method = "complete" )
+# Plot the obtained dendrogram
+plot(hc1, cex = 0.6, hang = -1)
+```
+
+```{r}
+# Compute with agnes
+hc2 <- agnes(df, method = "complete")
+```
+
+```{r}
+# Agglomerative coefficient
+hc2$ac
+```
+
+```{r}
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+```
+
+```{r}
+# function to compute coefficient
+ac <- function(x) {
+  agnes(df, method = x)$ac
+}
+map_dbl(m, ac)
+```
+
+```{r}
+hc3 <- agnes(df, method = "ward")
+pltree(hc3, cex = 0.6, hang = -1, main = "Dendrogram of agnes")
+```
+
+```{r}
+hc4 <- diana(df)
+```
+
+```{r}
+# Divise coefficient; amount of clustering structure found
+hc4$dc
+```
+
+```{r}
+# plot dendrogram
+pltree(hc4, cex = 0.6, hang = -1, main = "Dendrogram of diana")
+```
+
+```{r}
+# Ward's method
+hc5 <- hclust(d, method = "ward.D2" )
+
+```
+
+```{r}
+# Cut tree into 4 groups
+sub_grp <- cutree(hc5, k = 4)
+```
+
+```{r}
+# Number of members in each cluster
+table(sub_grp)
+USArrests %>%
+  mutate(cluster = sub_grp) %>%
+  head
+```
+
+```{r}
+plot(hc5, cex = 0.6)
+rect.hclust(hc5, k = 4, border = 2:5)
+```
+
+```{r}
+fviz_cluster(list(data = df, cluster = sub_grp))
+```
+
+```{r}
+# Cut agnes() tree into 4 groups
+hc_a <- agnes(df, method = "ward")
+cutree(as.hclust(hc_a), k = 4)
+```
+
+```{r}
+# Cut diana() tree into 4 groups
+hc_d <- diana(df)
+cutree(as.hclust(hc_d), k = 4)
+```
+
+```{r}
+# Compute distance matrix
+res.dist <- dist(df, method = "euclidean")
+```
+
+```{r}
+# Compute 2 hierarchical clusterings
+hc1 <- hclust(res.dist, method = "complete")
+hc2 <- hclust(res.dist, method = "ward.D2")
+```
+
+```{r}
+# Create two dendrograms
+dend1 <- as.dendrogram (hc1)
+dend2 <- as.dendrogram (hc2)
+```
+
+```{r}
+tanglegram(dend1, dend2)
+dend_list <- dendlist(dend1, dend2)
+```
+
+```{r}
+tanglegram(dend1, dend2,
+  highlight_distinct_edges = FALSE, # Turn-off dashed lines
+  common_subtrees_color_lines = FALSE, # Turn-off line colors
+  common_subtrees_color_branches = TRUE, # Color common branches 
+  main = paste("entanglement =", round(entanglement(dend_list), 2))
+  )
+```
+
+```{r}
+fviz_nbclust(df, FUN = hcut, method = "wss")
+```
+
+```{r}
+fviz_nbclust(df, FUN = hcut, method = "silhouette")
+```
+
+```{r}
+gap_stat <- clusGap(df, FUN = hcut, nstart = 25, K.max = 10, B = 50)
+```
+
+```{r}
+fviz_gap_stat(gap_stat)
+```
