@@ -1,0 +1,36 @@
+---
+title: "vkonda_Week 9.Rmd"
+author: "Vihari Konda"
+date: "7/28/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# adding a trend line to the dataset plot - scatter plot with loess curve
+```{r}
+data(airquality)
+with(airquality,
+       {
+         plot(Temp, Ozone)
+         lines(loess.smooth(Temp, Ozone)) 
+         }
+       )
+```
+
+# base plot with title
+```{r}
+data(mtcars)
+with(mtcars, plot(mpg, disp))
+title("mpg vs. displacement")
+```
+
+#relation between life expetencey and salary(income) and how it varies by state in united states
+```{r}
+library(lattice)
+state = data.frame(state.x77, region = state.region)
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4, 1))
+```
+
