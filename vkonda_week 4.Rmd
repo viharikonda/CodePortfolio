@@ -1,0 +1,135 @@
+---
+title: "Week 4"
+author: "Vihari Konda"
+date: "7/25/2019"
+output: pdf_document
+---
+
+# Week 4
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#creating a matrix
+```{r}
+x = 1:6
+y = 6:10
+z = 11:15
+
+cbind(x,y,z)
+rbind(x,y,z)
+```
+
+```{r}
+cbind(c(1,2,3,4,5,6),
+      c("a", "b", "c", "d", "e", "f"))
+```
+
+```{r}
+matrix(data = 1:10,
+       nrow = 2,
+       ncol = 5)
+```
+
+```{r}
+# creating a matrix
+dataset = data.frame("index" = c(1, 2, 3, 4, 5),
+                     "sex" = c("f", "f", "f", "m", "m"),
+                     "age" = c(18, 21, 23, 19, 26))
+dataset
+```
+
+```{r}
+# structure of the dataset
+str(dataset)
+```
+
+```{r}
+# matrix without factors
+dataset = data.frame("index" = c(1, 2, 3, 4, 5),
+                     "sex" = c("f", "f", "f", "m", "m"),
+                     "age" = c(18, 21, 23, 19, 26),
+                     stringsAsFactors = FALSE)
+dataset
+```
+
+```{r}
+#description of dataset
+dataset
+str(dataset)
+```
+
+```{r}
+# top and bottom rows of the dataset InsectSprays
+head(InsectSprays)
+tail(InsectSprays)
+```
+
+```{r}
+summary(InsectSprays)
+```
+
+```{r}
+str(InsectSprays)
+```
+
+```{r}
+# column names of tooth growth dataset
+names(ToothGrowth)
+```
+
+```{r}
+#length of each columns
+ToothGrowth$len
+```
+
+```{r}
+# Mean of the column
+mean(ToothGrowth$len)
+```
+
+```{r}
+#Subset Supp column as table
+table(ToothGrowth$supp)
+```
+
+```{r}
+# len and supp columns of ToothGrowth
+head(ToothGrowth[c("len", "supp")])
+```
+
+```{r}
+#Subsetting dataset
+ToothGrowth[1:6, 1]
+```
+
+```{r}
+ToothGrowth[1:3, c(1,3)]
+```
+
+```{r}
+#slicing basd on a condition
+ToothGrowth.VC = ToothGrowth[ToothGrowth$supp == "VC", ]
+ToothGrowth.VC
+```
+
+```{r}
+ToothGrowth.OJ.a = ToothGrowth[ToothGrowth$supp == "OJ" &
+                                ToothGrowth$dose < 1, ]
+```
+
+```{r}
+#Subsetting the data
+subset(x = ToothGrowth,
+      subset = len < 20 &
+               supp == "OJ" &
+               dose >= 1)
+```
+
+```{r}
+#Subset based on a condition
+subset(x = ToothGrowth,
+    subset = len > 30 & supp == "VC",
+    select = c(len, dose))
+```
+
