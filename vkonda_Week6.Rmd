@@ -1,0 +1,100 @@
+---
+title: "Week 6 - Data transformations"
+author: "Vihari Konda"
+date: "7/28/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(nycflights13)
+library(tidyverse)
+```
+
+#Data filtering based on the point of interest
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+June20 = filter(flights, month == 6, day == 20)
+June16 = filter(flights, month == 6, day == 16)
+Dec07 = filter(flights, month == 12, day == 07)
+```
+
+#filtering with logical operators
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+#subsetting data to be in between june 16th through june 20
+June16to20<-filter(flights, month==6, day>=16|day<21)
+```
+
+```{r}
+#missing values of the dataset
+df.info = function(x) {
+  column.info = data.frame( column = names(sapply(x,class)),
+                            unique.values = sapply(x, function(y) length(unique(y))),
+                            missing.count = colSums(is.na(x)),
+                            missing.pct = round(colSums(is.na(x))/nrow(x)*100, 2))
+row.names(column.info) = 1:nrow(column.info)
+list(
+     column.details = column.info
+     )
+}
+
+df.info(June16to20)
+```
+
+#Sorting data -  descending order 
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+arrange(June20, desc(origin))
+```
+
+#subset using select 
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+select(flights, flight, tailnum, origin, dest)
+select(Dec07, flight,carrier, tailnum, origin, dest, everything())
+```
+
+
+#Rename column names
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+rename(June16, tail_num = tailnum)
+```
+
+
+#Adding new columns to the dataset
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+mutate(June16to20, speed= distance / air_time * 60, traveltime=sched_arr_time+arr_delay)
+```
+
+#only keeping new variables
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+df1 = transmute(flights,
+  gain = dep_delay - arr_delay,
+  hours = air_time / 60,
+  gain_per_hour = gain / hours
+)
+
+head(df1)
+```
+
+# grouped summary
+```{r}
+by_day = group_by(flights, year, month, day)
+head(summarise(by_day, delay = mean(dep_delay, na.rm = TRUE)))
+```
+
+
+# group and ungroup
+```{r}
+daily = group_by(flights, year, month, day)
+head((per_day = summarise(daily, flights = n())))
+```
+# no longer grouped by date
+```{r}
+daily %>% 
+  ungroup() %>%
+  summarise(flights = n())
+```
+
